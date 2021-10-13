@@ -20,9 +20,9 @@ export default {
       const L2BridgeWrapper = this.$store.state.l2Contracts.L2BridgeWrapper
 
       const origin = this.$store.state.userAddress
-      const l1Token = '0x65e467Cbe170B0fF8f707F4B8105daCd4A3517c0'
-      const l2Token = '0x0e2F71F8DCd29D41AB3EED826B467e48c3D7519b'
-      const l1Oracle = '0xb33f704f2C43F36Cb3cE10f111887acafDf4D3Bc'
+      const l1Token = this.$store.state.l1Contracts.L1Token.address
+      const l2Token = this.$store.state.l2Contracts.L2Token.address
+      const l1Oracle = this.$store.state.l1Contracts.L1Oracle.address
 
       const tx = await L2BridgeWrapper.fastWithdraw(
         origin,

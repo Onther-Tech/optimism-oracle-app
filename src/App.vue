@@ -67,7 +67,7 @@ export default {
 }
 
 .tabs {
-  margin-top: 100px;
+  margin-top: 40px;
   width: 532px;
 }
 

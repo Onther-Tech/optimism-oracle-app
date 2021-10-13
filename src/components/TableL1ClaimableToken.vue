@@ -11,7 +11,7 @@
         <el-descriptions-item label="Fee">{{ tokenInfo.fee }}</el-descriptions-item>
         <el-descriptions-item label="Origin">{{ tokenInfo.origin }}</el-descriptions-item>
       </el-descriptions>
-      <el-button :loading="loading" type="primary" :disabled="!$store.state.signer" @click="buy" style="width: 100%; margin-top: 8px;">Buy</el-button>
+      <el-button :loading="loading" type="primary" :disabled="!$store.state.signer" @click="buy(tokenInfo.tokenId)" style="width: 100%; margin-top: 8px;">Buy</el-button>
     </div>
   </div>
 </template>
@@ -24,11 +24,12 @@ export default {
     }
   },
   methods: {
-    async buy () {
+    async buy (tokenId) {
       const L1Auction = this.$store.state.l1Contracts.L1Auction
-      const tx = await L1Auction.buy(0)
+      const tx = await L1Auction.buy(tokenId)
 
-      await tx.wait();
+      await tx.wait()
+      this.$store.dispatch('getBalance')
     }
   },
 }
