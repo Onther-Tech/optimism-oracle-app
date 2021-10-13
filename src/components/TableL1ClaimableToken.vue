@@ -1,33 +1,17 @@
 <template>
   <div class="table-l1-claimable-token">
     <h3>newly minted claimable tokens</h3>
-    {{ $store.state.tokenInfos }}
-    <div v-for="tokenInfo in $store.state.tokenInfos" :key="String(tokenInfo.transactionIndex)">
-      <div>
-        <!-- <h4>tokenId: {{ tokenInfo.tokenId }}</h4> -->
-        <el-link type="primary"
-                :href="`https://kovan-optimistic.etherscan.io/tx/${parseInt(tokenInfo.transactionIndex)+1}`"
-                target="_blank"
-        >
-          transactionIndex: {{ parseInt(tokenInfo.transactionIndex)+1 }}
-        </el-link>
-        <div>
-          origin: {{ tokenInfo.origin }}
-        </div>
-        <div>
-          l1Token: {{ tokenInfo.l1Token }}
-        </div>
-        <div>
-          l2Token: {{ tokenInfo.l2Token }}
-        </div>
-        <div>
-          amount: {{ tokenInfo.amount }}
-        </div>
-        <div>
-          fee: {{ tokenInfo.fee }}
-        </div>
-      </div>
-      <el-button :loading="loading" type="primary" :disabled="!$store.state.signer" @click="buy">Buy</el-button>
+    <div v-for="tokenInfo in $store.state.tokenInfos" :key="String(tokenInfo.tokenId)">
+      <el-descriptions class="margin-top" title="" :column="1" border style="margin-top: 32px;">
+        <el-descriptions-item label="Token ID">{{ tokenInfo.tokenId }}</el-descriptions-item>
+        <el-descriptions-item label="Tx Index">{{ parseInt(tokenInfo.transactionIndex)+1 }}</el-descriptions-item>
+        <el-descriptions-item label="L1 Token">{{ tokenInfo.l1Token }}</el-descriptions-item>
+        <el-descriptions-item label="L2 Token">{{ tokenInfo.l2Token }}</el-descriptions-item>
+        <el-descriptions-item label="Amount">{{ tokenInfo.amount }}</el-descriptions-item>
+        <el-descriptions-item label="Fee">{{ tokenInfo.fee }}</el-descriptions-item>
+        <el-descriptions-item label="Origin">{{ tokenInfo.origin }}</el-descriptions-item>
+      </el-descriptions>
+      <el-button :loading="loading" type="primary" :disabled="!$store.state.signer" @click="buy" style="width: 100%; margin-top: 8px;">Buy</el-button>
     </div>
   </div>
 </template>
