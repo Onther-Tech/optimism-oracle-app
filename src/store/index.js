@@ -50,14 +50,14 @@ export default new Vuex.Store({
       const l1Contracts = {
         OVM_CanonicalTransactionChain: '0xe28c499EB8c36C0C18d1bdCdC47a51585698cb93',
 
-        L1Token: '0xe603C47d2037EBD079A708ee7A19D5E57955969F',
-        L1ClaimableToken: '0x1440843F431144752055f7EAD75B01C1EC987529',
-        L1Oracle: '0xcfAF2925Bf7c0A9F36ba0228146E2e7a110324a5',
-        L1Auction: '0x3cB0b3DCc0c4709f9c352d09774f438c623A3797',
+        L1Auction: '0x7Da7BEaa787FAF68a2e5a74f8EDEdCE2a9251b77',
+        L1ClaimableToken: '0x8Df10660186dC0D89664E56b1de3304DB2eFeC0d',
+        L1Oracle: '0x0c1D3D83ce2635e8fF26cA5761D5A2cD9c349f17',
+        L1Token: '0xF2e47aC4072E26DBdB26dacEA32AaC2703B53B39',
       }
       const l2Contracts = {
-        L2Token: '0xB0599c90F94BBC3e817eb5ea730dc9e37A8E317a',
-        L2BridgeWrapper: '0x6FEaE39cf778a39303c7F6C1A710E0FF759EfAA9',
+        L2BridgeWrapper: '0x1177C0d69d3eC21a35B14ddc3DFF1E1FADc747A1',
+        L2Token: '0xD769b0ae3a1A63fcC9b239c1c662273882B5Dee4',
       }
 
       // load l1 contracts

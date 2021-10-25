@@ -10,6 +10,7 @@
       >
         <FormL1FastWithdrawal />
         <TableL1ClaimableToken />
+        <FormClaim />
       </el-tab-pane>
       <el-tab-pane
         label="L2"
@@ -26,6 +27,7 @@
 <script>
 import Balance from './components/Balance.vue'
 import ButtonConnect from './components/ButtonConnect.vue'
+import FormClaim from './components/FormClaim.vue'
 import FormL1FastWithdrawal from './components/FormL1FastWithdrawal.vue'
 import FormL2FastWithdrawal from './components/FormL2FastWithdrawal.vue'
 import TableL2FastWithdrawal from './components/TableL2FastWithdrawal.vue'
@@ -36,6 +38,7 @@ export default {
   components: {
     Balance,
     ButtonConnect,
+    FormClaim,
     FormL1FastWithdrawal,
     FormL2FastWithdrawal,
     TableL2FastWithdrawal,
