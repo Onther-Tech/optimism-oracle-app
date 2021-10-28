@@ -1,30 +1,30 @@
-const { JsonRpcProvider } = require("@ethersproject/providers")
-const { Contract, BigNumber } = require("ethers")
+const { ethers, Contract, BigNumber } = require("ethers")
+const { MerkleTree } = require("merkletreejs")
+
 const OVM_CanonicalTransactionChain = require("./OVM_CanonicalTransactionChain.json")
 const OVM_ExecutionManager = require("./OVM_ExecutionManager.json")
 
-const l1Provider = new JsonRpcProvider("https://eth-mainnet.alchemyapi.io/v2/q-eMBfmSkK7ln-wFNaokuXOhF4GTGH9w")
-// const l2Provider = new JsonRpcProvider(L2_NODE_WEB3_URL)
-const CanonicalTransactionChain = new Contract(
-  "0x4bf681894abec828b212c906082b444ceb2f6cf6",
-  OVM_CanonicalTransactionChain.abi,
-  l1Provider
-)
-const ExecutionManager = new Contract(
-  "0x2745C24822f542BbfFB41c6cB20EdF766b5619f5",
-  OVM_ExecutionManager.abi,
-  l1Provider
-)
-
-class Generator {
-  constructor(provider, ctc, em) {
+export class Generator {
+  constructor (provider) {
     this.provider = provider
-    this.ctc = ctc
-    this.em = em
+    this.ctc = new Contract(
+      "0x4bf681894abec828b212c906082b444ceb2f6cf6",
+      OVM_CanonicalTransactionChain.abi,
+      this.provider
+    )
+    this.em = new Contract(
+      "0x2745C24822f542BbfFB41c6cB20EdF766b5619f5",
+      OVM_ExecutionManager.abi,
+      this.provider
+    )
+  }
+
+  setIndex (index) {
+    this.index = index
   }
 
   async getBatchEvent () {
-    const index = 3596843 // user input
+    const index = this.index
 
     const r = 250
     let to = await this.provider.getBlockNumber()
@@ -72,8 +72,7 @@ class Generator {
     }
   }
 
-  async run() {
-    const event = await this.getBatchEvent()
+  async getTransactions (event) {
     const transaction = await this.provider.getTransaction(
       event.transactionHash
     )
@@ -81,8 +80,8 @@ class Generator {
 
     const transactions = []
     const txdata = this.fromHexString(transaction.data)
-    const shouldStartAtBatch = BigNumber.from(txdata.slice(4, 9))
-    const totalElementsToAppend = BigNumber.from(txdata.slice(9, 12))
+    // const shouldStartAtBatch = BigNumber.from(txdata.slice(4, 9))
+    // const totalElementsToAppend = BigNumber.from(txdata.slice(9, 12))
     const numContexts = BigNumber.from(txdata.slice(12, 15))
 
     let nextTxPointer = 15 + 16 * numContexts.toNumber()
@@ -116,7 +115,7 @@ class Generator {
           transaction: {
             blockNumber: context.ctxBlockNumber.toNumber(),
             timestamp: context.ctxTimestamp.toNumber(),
-            gasLimit: emGasLimit, // TODO: ovm 2.0 remove ExecutionManager contract.
+            gasLimit: emGasLimit.toNumber(), // TODO: ovm 2.0 removes ExecutionManager contract.
             entrypoint: '0x4200000000000000000000000000000000000005',
             l1TxOrigin: '0x' + '00'.repeat(20),
             l1QueueOrigin: 0,
@@ -134,15 +133,81 @@ class Generator {
         nextTxPointer += 3 + txDataLength.toNumber()
       }
     }
-
     return transactions
+  }
+
+  getTransactionBatchHeader (event) {
+    if (!event) {
+      return
+    }
+
+    return {
+      batchIndex: event.args._batchIndex.toNumber(),
+      batchRoot: event.args._batchRoot,
+      batchSize: event.args._batchSize.toNumber(),
+      prevTotalElements: event.args._prevTotalElements.toNumber(),
+      extraData: event.args._extraData,
+    }
+  }
+
+  async getTransactionBatchProof() {
+    const event = await this.getBatchEvent()
+
+    const batchHeader = this.getTransactionBatchHeader(event)
+    const transactions = await this.getTransactions(event)
+
+    const elements = []
+    for (
+      let i = 0;
+      i < Math.pow(2, Math.ceil(Math.log2(transactions.length)));
+      i++
+    ) {
+      if (i < transactions.length) {
+        const tx = transactions[i]
+        elements.push(
+          `0x01${BigNumber.from(tx.transaction.timestamp)
+            .toHexString()
+            .slice(2)
+            .padStart(64, '0')}${BigNumber.from(tx.transaction.blockNumber)
+            .toHexString()
+            .slice(2)
+            .padStart(64, '0')}${tx.transaction.data.slice(2)}`
+        )
+      } else {
+        elements.push('0x' + '00'.repeat(32))
+      }
+    }
+
+    const hash = (el) => {
+      return Buffer.from(ethers.utils.keccak256(el).slice(2), 'hex')
+    }
+
+    const leaves = elements.map((element) => {
+      return hash(element)
+    })
+
+    const tree = new MerkleTree(leaves, hash)
+    const batchIndex = this.index - batchHeader.prevTotalElements
+    const treeProof = tree.getHexProof(leaves[batchIndex], batchIndex)
+
+    return {
+      transaction: transactions[batchIndex].transaction,
+      transactionChainElement: transactions[batchIndex].transactionChainElement,
+      transactionBatchHeader: batchHeader,
+      transactionProof: {
+        index: batchIndex,
+        siblings: treeProof,
+      },
+    }
   }
 }
 
-const generator = new Generator(
-  l1Provider,
-  CanonicalTransactionChain,
-  ExecutionManager
-)
+// const generator = new Generator(
+//   l1Provider,
+//   CanonicalTransactionChain,
+//   ExecutionManager
+// )
 
-generator.run();
+// const index = 3596843
+// generator.setIndex(index)
+// generator.run()

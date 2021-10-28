@@ -8,6 +8,8 @@
         clas="tab"
         stretch
       >
+        <FormL1Proof />
+        <FormL1FastWithdrawal />
         <FormL1FastWithdrawal />
         <TableL1ClaimableToken />
         <FormClaim />
@@ -28,6 +30,7 @@
 import Balance from './components/Balance.vue'
 import ButtonConnect from './components/ButtonConnect.vue'
 import FormClaim from './components/FormClaim.vue'
+import FormL1Proof from './components/FormL1Proof.vue'
 import FormL1FastWithdrawal from './components/FormL1FastWithdrawal.vue'
 import FormL2FastWithdrawal from './components/FormL2FastWithdrawal.vue'
 import TableL2FastWithdrawal from './components/TableL2FastWithdrawal.vue'
@@ -38,6 +41,7 @@ export default {
   components: {
     Balance,
     ButtonConnect,
+    FormL1Proof,
     FormClaim,
     FormL1FastWithdrawal,
     FormL2FastWithdrawal,

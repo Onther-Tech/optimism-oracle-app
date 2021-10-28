@@ -5,10 +5,14 @@ import { ethers } from 'ethers'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { loadContract } from '../utils/index'
 
+import { Generator } from '../../generate'
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    proofGenerator: null,
+
     l1Provider: null,
     l2Provider: null,
 
@@ -130,6 +134,7 @@ export default new Vuex.Store({
           state.userAddress = await signer.getAddress()
           state.signer = signer;
 
+          state.proofGenerator = new Generator(provider)
           await dispatch('getBalance')
         } catch (err) {
           console.log(err.message);
